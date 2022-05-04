@@ -47,23 +47,7 @@ function factory(opt) {
     }
     // if there is data to be stored, pass that data to skynet
     if (data) {
-      client
-        .uploadData(data, key)
-        .then((skylink) => {
-          if (debug) {
-            console.log(`${key} saved to ${skylink}`);
-          }
-          client.db
-            .setDataLink(privateKey, key, skylink)
-            .then((res) => {
-              if (debug) {
-                console.log(`${getEntryLink(publicKey, key)} Updated.`);
-              }
-              cb(null, 1);
-            })
-            .catch((err) => {
-              cb(err, "skynet");
-            });
+      client.db.setJSON(privateKey, key, JSON.parse(data)).then((skylink) => { if (debug) {console.log(`Key: ${key} saved to ${skylink}`);}; cb(null,1)
         })
         .catch((err) => {
           // if there is an error and debugging is on, make it easier to debug
@@ -92,17 +76,11 @@ function factory(opt) {
       // console.log("reading from Skylink:", resolverSkylink);
       // debugger;
     }
-
-    client
-      .downloadData(resolverSkylink)
-      .then((res) => {
-        if (debug) {
-          console.log(`Data Downloaded from ${resolverSkylink}`);
-          // console.log(String(res));
-        }
-
-        // Pass the data back to gun. In the case where the data returned is null or something we'll return undefined
-        cb(null, res || undefined);
+    client.db.getJSON(publicKey, key).then(data => {
+      // if we're debugging, log the data we retrieved
+      if (debug) { console.log("Retrieved Data: " + JSON.stringify(data['data'])+"\n"); }
+      // Pass the data back to gun. In the case where the data returned is null or something we'll return undefined
+      cb(null, JSON.stringify(data['data']) || undefined) 
       })
       .catch((err) => {
         console.log("data not downloaded");
