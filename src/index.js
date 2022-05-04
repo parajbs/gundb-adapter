@@ -41,13 +41,22 @@ function factory(opt) {
   store.put = function (key, data, cb) {
     // if the debug setting is on, print the key and the data we're storing to skynet, and pause execution using debugger statement
     if (debug) {
-      console.log("[Put] \nKey: " + key + " \nData: ");
+      console.log("[Put] \nKey: " + key + " \nData: " + data);
       // console.log(JSON.parse(data));
       // debugger;
     }
     // if there is data to be stored, pass that data to skynet
     if (data) {
-      client.db.setJSON(privateKey, key, JSON.parse(data)).then((skylink) => { if (debug) {console.log(`Key: ${key} saved to ${skylink}`);}; cb(null,1)
+      client.db
+        .setJSON(privateKey, key, JSON.parse(data))
+        .then((skylink) => {
+          if (debug) {
+            console.log(`Key: ${key} saved to ${skylink}`);
+            console.log(
+              `The dataLink: ${getEntryLink(publicKey, key)} Updated.`
+            );
+          }
+          cb(null, 1);
         })
         .catch((err) => {
           // if there is an error and debugging is on, make it easier to debug
@@ -76,11 +85,15 @@ function factory(opt) {
       // console.log("reading from Skylink:", resolverSkylink);
       // debugger;
     }
-    client.db.getJSON(publicKey, key).then(data => {
-      // if we're debugging, log the data we retrieved
-      if (debug) { console.log("Retrieved Data: " + JSON.stringify(data['data'])+"\n"); }
-      // Pass the data back to gun. In the case where the data returned is null or something we'll return undefined
-      cb(null, JSON.stringify(data['data']) || undefined) 
+    client.db
+      .getJSON(publicKey, key)
+      .then((data) => {
+        // if we're debugging, log the data we retrieved
+        if (debug) {
+          console.log("Retrieved Data: " + JSON.stringify(data["data"]) + "\n");
+        }
+        // Pass the data back to gun. In the case where the data returned is null or something we'll return undefined
+        cb(null, JSON.stringify(data["data"]) || undefined);
       })
       .catch((err) => {
         console.log("data not downloaded");

@@ -24,6 +24,6 @@
   "license": "MIT",
   "dependencies": {
     "@skynetlabs/skynet-nodejs": "https://github.com/parajbs/nodejs-skynet",
-    "gun": "^0.2020.1237"
+    "gun": "^0.2020.1235"
   }
 }
